@@ -1,0 +1,116 @@
+package com.yangyang.recycylerviewcardview;
+
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private List<News> list;
+    private MyAdapter ma;
+    private static String Url = "http://10.151.208.83:8080/JsonProject2/JsonAction";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        recyclerView = (RecyclerView) findViewById(R.id.swap_list);
+        MyAsyncTask task = new MyAsyncTask();
+        task.execute(Url);
+
+
+    }
+
+    class MyAsyncTask extends AsyncTask<String, Void, List<News>> {
+        @Override
+        protected void onPostExecute(List<News> newses) {
+            super.onPostExecute(newses);
+            MyAdapter adapter = new MyAdapter(MainActivity.this, newses);
+            LinearLayoutManager lm = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
+            recyclerView.setLayoutManager(lm);
+            recyclerView.setAdapter(adapter);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected List<News> doInBackground(String... params) {
+            return getJsonData(params[0]);
+        }
+    }
+
+    private List<News> getJsonData(String Url) {
+        List<News> mlist = new ArrayList<>();
+        News news;
+        try {
+            String jsonString=readStream(new URL(Url).openStream());
+            JSONObject jsonObject;
+            Log.d("xys", jsonString);
+
+            try {
+                jsonObject = new JSONObject(jsonString);
+                JSONArray jsonArray = jsonObject.getJSONArray("persons");
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    jsonObject = jsonArray.getJSONObject(i);
+                    news = new News();
+                    news.setIconUrl(jsonObject.getString("iconUrl"));//这里重写一遍
+                    news.setContent(jsonObject.getString("content"));
+                    news.setTitle(jsonObject.getString("title"));
+                    mlist.add(news);
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return mlist;
+    }
+
+    private String readStream(InputStream is){
+        InputStreamReader isr;
+        String result="";
+        try {
+            String line="";
+            isr=new InputStreamReader(is,"utf-8");
+            BufferedReader br=new BufferedReader(isr);
+            try {
+                while((line=br.readLine())!=null){
+                    result+=line;
+
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
+
+    }
+
+}
