@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,6 +75,18 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(List<News> newses) {
             super.onPostExecute(newses);
             ma = new MyAdapter(MainActivity.this, newses);
+            ma.msetOnClickListener(new MyAdapter.mClickListenner() {
+                @Override
+                public void mOnItemClick(View v, int pos) {
+                    Toast.makeText(MainActivity.this,"click"+pos,Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void mOnItemLongClick(View v, int pos) {
+                    Toast.makeText(MainActivity.this,"longclick"+pos,Toast.LENGTH_SHORT).show();
+
+                }
+            });
            //设置布局管理器，可以将其设置成网格，瀑布流等多种形式。
 //            recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
             recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));

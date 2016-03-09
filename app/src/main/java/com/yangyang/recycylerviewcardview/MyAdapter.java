@@ -21,6 +21,16 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
     private LayoutInflater layoutInflater;
     private Context context;
     //private List<Integer> mHeights;
+    interface mClickListenner {
+        public void mOnItemClick(View v,int pos);
+
+        public void mOnItemLongClick(View v,int pos);
+    }
+    private mClickListenner listenner;
+    public void msetOnClickListener(mClickListenner listenner){
+        this.listenner=listenner;
+    }
+
 
     public MyAdapter(Context context, List<News> data) {
         this.context = context;
@@ -30,6 +40,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
 //        for(int i=0;i<data.size();i++){
 //            mHeights.add((int) (100+Math.random()*300));//设置的高度自己要注意大概是多少
 //        }
+
     }
     //创建View
     @Override
@@ -40,13 +51,32 @@ public class MyAdapter extends RecyclerView.Adapter<MyHolder> {
     }
     //绑定ViewHolder
     @Override
-    public void onBindViewHolder(MyHolder holder, int position) {
+    public void onBindViewHolder(final MyHolder holder, final int position) {
+        //为瀑布流设置随机的高度
 //        ViewGroup.LayoutParams params=holder.itemView.getLayoutParams();
 //        params.height=mHeights.get(position);
 //        holder.itemView.setLayoutParams(params);
         holder.im.setImageResource(R.mipmap.ic_launcher);//等一下再写异步加载图片
         holder.tvTitle.setText(data.get(position).getTitle());
         holder.tvContent.setText(data.get(position).getContent());
+        if(listenner!=null){
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listenner.mOnItemClick(holder.itemView,position);
+
+                }
+
+            });
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    listenner.mOnItemLongClick(holder.itemView,position);
+                    return false;
+                }
+            });
+        }
     }
 
     @Override
