@@ -4,9 +4,15 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,6 +31,29 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private List<News> list;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater=new MenuInflater(this);
+        inflater.inflate(R.menu.main,menu);
+        return super.onCreateOptionsMenu(menu);
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.add1:
+                ma.add(1);
+                break;
+            case R.id.delete1:
+                ma.delete(1);
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private MyAdapter ma;
     private static String Url = "http://10.151.208.83:8080/JsonProject2/JsonAction";
 
@@ -43,10 +72,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<News> newses) {
             super.onPostExecute(newses);
-            MyAdapter adapter = new MyAdapter(MainActivity.this, newses);
-            LinearLayoutManager lm = new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false);
-            recyclerView.setLayoutManager(lm);
-            recyclerView.setAdapter(adapter);
+            ma = new MyAdapter(MainActivity.this, newses);
+           //设置布局管理器，可以将其设置成网格，瀑布流等多种形式。
+//            recyclerView.setLayoutManager(new StaggeredGridLayoutManager(3,StaggeredGridLayoutManager.VERTICAL));
+            recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+            //设置适配器
+            recyclerView.setAdapter(ma);
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
         }
 
         @Override
